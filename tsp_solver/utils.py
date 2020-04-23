@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial import distance_matrix,distance
-from googleORsolver import *
-from tsp_optimal import *
+from .googleORsolver import *
+from .tsp_optimal import *
 
 
 def coordToDistMat(coord):
