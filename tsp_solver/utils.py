@@ -1,8 +1,8 @@
 import numpy as np
-from scipy.spatial import distance_matrix, distance
-from .googleORsolver import *
-from .tsp_optimal import *
-from itertools import combinations
+from scipy.spatial import distance_matrix,distance
+from googleORsolver import *
+from tsp_optimal import *
+import mlrose
 
 
 def coord_to_dist_mat(coord):
@@ -156,6 +156,13 @@ class BaselineSolver(object):
 
     def google_or_solver(self):
         return np.array(GoogleORsolver(self.dist_mat))
+
+    def genetic(self):
+        problem_no_fit = mlrose.TSPOpt(length = 15, coords = self.coord, maximize=False)
+        best_state, best_fitness = mlrose.genetic_alg(problem_no_fit, mutation_prob = 0.2, max_attempts = 100,
+                                              random_state = 2)
+
+        return best_state
 
     def optimal(self):
         return tsp_opt(self.coord)
