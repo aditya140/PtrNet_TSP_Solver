@@ -78,7 +78,14 @@ class TSPDataset(Dataset):
         return {"Points_List": points_list, "Solutions": solutions}
 
     def _read_file(self, file):
+        """[summary]
+
+        Arguments:
+            file {[type]} -- 
+
+        """        
         parser = FileParser(self.seq_len, file)
+        self.data_size=len(parser.tours)
         points_list = np.array(parser.coords)
         solutions = np.array(parser.tours)
         return {"Points_List": points_list, "Solutions": solutions}
