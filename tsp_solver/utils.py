@@ -4,7 +4,7 @@ from .googleORsolver import *
 from .tsp_optimal import *
 from itertools import combinations
 import mlrose
-
+import torch
 
 def coord_to_dist_mat(coord):
     return distance_matrix(coord, coord)
@@ -53,12 +53,14 @@ class BaselineSolver(object):
     def solve_random(self):
         return self.solve(criterion="random")
 
-    def add_model(self, model, name="PtrNet"):
-        self.model[name] = model
-        self.solvers[name]=self.solve_model
+    def add_model(self, model):
+        self.model = model
+        self.solvers["Model"]=self.solve_model
 
     def solve_model(self):
-        pass
+        o,p=self.model(torch.tensor([self.coord]))
+        return p.tolist()[0]
+        
 
     def __create_mask(self, tour):
         ur = np.triu_indices(self.dist_mat.shape[0])
@@ -169,12 +171,12 @@ class BaselineSolver(object):
     def optimal(self):
         return tsp_opt(self.coord)
 
-    def solve_all(self, coord, returnTours=False, optimal=True):
+    def solve_all(self, coord,except_alg=[] , returnTours=False, ):
         self.create(coord)
 
         metrics = {}
         for name, solver in self.solvers.items():
-            if not(optimal and name=="Optimal"):
+            if name not in except_alg:
                 tour = solver()
                 if returnTours:
                     metrics[name] = (self.tour_length(tour), tour)
