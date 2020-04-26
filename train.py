@@ -1,4 +1,4 @@
-from hparams import params
+from hparams import model_params,train_params
 from TSPDataset import TSPDataset
 from torch.utils.data import Dataset,DataLoader
 from PointerNet import PointerNet
@@ -51,21 +51,19 @@ def eval(model,iter,loss_func,device):
 
 if __name__=="__main__":
     ## Create Dataset for training
-    train_dataset=TSPDataset(params.train_size,params.nof_points)
-    val_dataset=TSPDataset(params.val_size,params.nof_points)
-    test_dataset=TSPDataset(params.test_size,params.nof_points)
+    train_dataset=TSPDataset(train_params.train_size,train_params.nof_points,file=train_params.file,)
+    val_dataset=TSPDataset(train_params.val_size,train_params.nof_points)
 
-    train_dataloader=DataLoader(train_dataset,batch_size=params.batch_size,num_workers=10)
-    val_dataloader=DataLoader(val_dataset,batch_size=params.batch_size,num_workers=10)
-    test_dataloader=DataLoader(test_dataset,batch_size=params.batch_size,num_workers=10)
+    train_dataloader=DataLoader(train_dataset,batch_size=train_params.batch_size,num_workers=10)
+    val_dataloader=DataLoader(val_dataset,batch_size=train_params.batch_size,num_workers=10)
 
-    model_path="./"
+    model_path="./model/"
 
-    model = PointerNet(params.embedding_size,
-                    params.hiddens,
-                    params.nof_lstms,
-                    params.bidir)
-    if params.gpu:
+    model = PointerNet(model_params.embedding_size,
+                    model_params.hiddens,
+                    model_params.nof_lstms,
+                    model_params.bidir)
+    if model_params.gpu:
         device=torch.device('cuda')
     else:
         device=torch.device('cpu')
@@ -75,7 +73,7 @@ if __name__=="__main__":
     optimizer=optim.Adam(filter(lambda p: p.requires_grad,model.parameters()),lr=params.lr)
     best_valid_loss=float('inf')
 
-    for epoch in range(params.nof_epoch):
+    for epoch in range(train_params.nof_epoch):
         train_iterator = train_dataloader
         val_iterator = val_dataloader
         st_time=time.time()

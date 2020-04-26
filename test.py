@@ -1,28 +1,53 @@
-from tsp_solver import utils
-from tsp_solver import tsp_optimal
+from hparams import model_params,test_params
 from TSPDataset import TSPDataset
-from PointerNet import PointerNet
 from torch.utils.data import Dataset,DataLoader
+from PointerNet import PointerNet
+from tqdm import tqdm
+from tsp_solver.utils import BaselineSolver
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torch.autograd import Variable
+import numpy as np
+import math
+import time
 import pandas as pd
 
 
 
 
-data=TSPDataset(4,10,file="./data/test.txt")
-test_dataloader=DataLoader(data,batch_size=16,num_workers=10)
-solver=utils.BaselineSolver()
-remove_alg=["Genetic","Optimal"]
-Ptr=PointerNet(100,50,1,False)
-solver.add_model(Ptr)
-data=[]
-for i in test_dataloader:
-    for x,y in zip(i["Points"],i["Solution"]):
-        res=(solver.solve_all(x.tolist(),remove_alg,returnTours=False))
-        optimal=solver.tour_length(y.tolist())
-        for k in res.keys():
-            res[k]=res[k]/optimal
-        data.append(res)
-df=pd.DataFrame(data)
-print(df.mean())
+def main():
+    test_dataset=TSPDataset(test_params.train_size,test_params.nof_points,file=test_params.file,)
+    test_dataloader=DataLoader(test_dataset,batch_size=test_params.batch_size,num_workers=10)
+    model = PointerNet(model_params.embedding_size,
+                    model_params.hiddens,
+                    model_params.nof_lstms,
+                    model_params.bidir)
 
+    if model_params.gpu:
+        device=torch.device('cuda')
+    else:
+        device=torch.device('cpu')
 
+    model.to(device)
+    model.load_state_dict(torch.load(test_params.model))
+    solver = BaselineSolver()
+    remove_alg = ["Genetic", "Optimal"]
+    solver.add_model(model)
+
+    data = []
+    for i in test_dataloader:
+        for x, y in zip(i["Points"], i["Solution"]):
+            res = solver.solve_all(x.tolist(), remove_alg, returnTours=False)
+            optimal = solver.tour_length(y.tolist())
+            for k in res.keys():
+                res[k] = res[k] / optimal
+            res["Optimal"]=optimal
+            data.append(res)
+    df = pd.DataFrame(data)
+    df.to_csv("results.csv")
+    print(df.mean())
+if __name__ == '__main__':
+    main()
+    
