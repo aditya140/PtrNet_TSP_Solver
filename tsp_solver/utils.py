@@ -1,7 +1,8 @@
 import numpy as np
 from scipy.spatial import distance_matrix,distance
-from googleORsolver import *
-from tsp_optimal import *
+from .googleORsolver import *
+from .tsp_optimal import *
+from itertools import combinations
 import mlrose
 
 
@@ -19,6 +20,7 @@ class BaselineSolver(object):
             "Google OR": self.google_or_solver,
             "random": self.solve_random,
             "Nearest insertion": self.nearest_insertion,
+            "Genetic":self.genetic
         }
 
     def create(self, coord):
@@ -158,7 +160,7 @@ class BaselineSolver(object):
         return np.array(GoogleORsolver(self.dist_mat))
 
     def genetic(self):
-        problem_no_fit = mlrose.TSPOpt(length = 15, coords = self.coord, maximize=False)
+        problem_no_fit = mlrose.TSPOpt(length = len(self.coord), coords = self.coord, maximize=False)
         best_state, best_fitness = mlrose.genetic_alg(problem_no_fit, mutation_prob = 0.2, max_attempts = 100,
                                               random_state = 2)
 
@@ -167,16 +169,17 @@ class BaselineSolver(object):
     def optimal(self):
         return tsp_opt(self.coord)
 
-    def solve_all(self, coord, returnTours=False):
+    def solve_all(self, coord, returnTours=False, optimal=True):
         self.create(coord)
 
         metrics = {}
         for name, solver in self.solvers.items():
-            tour = solver()
-            if returnTours:
-                metrics[name] = (self.tour_length(tour), tour)
-            else:
-                metrics[name] = self.tour_length(tour)
+            if not(optimal and name=="Optimal"):
+                tour = solver()
+                if returnTours:
+                    metrics[name] = (self.tour_length(tour), tour)
+                else:
+                    metrics[name] = self.tour_length(tour)
         return metrics
 
 
