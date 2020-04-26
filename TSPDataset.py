@@ -83,7 +83,7 @@ class TSPDataset(Dataset):
         Arguments:
             file {[type]} -- 
 
-        """        
+        """ 
         parser = FileParser(self.seq_len, file)
         self.data_size=len(parser.tours)
         points_list = np.array(parser.coords)
