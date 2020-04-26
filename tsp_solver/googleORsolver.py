@@ -3,7 +3,7 @@ from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 
 
-def GoogleORsolver(dist_mat):
+def GoogleORsolver(dist_mat,isFloat=True):
     def create_data_model(dist_mat):
         """Stores the data for the problem."""
         data = {}
@@ -93,4 +93,9 @@ def GoogleORsolver(dist_mat):
             return get_tour(manager,routing,solution)
             # max_route_distance=print_solution(data, manager, routing, solution)
         return False
+    def scale(dist_mat):
+        scale=100000000
+        return dist_mat*scale,scale
+    if isFloat:
+        dist_mat,factor=scale(dist_mat)
     return solve(dist_mat)
