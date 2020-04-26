@@ -1,4 +1,5 @@
 import requests
+from zipfile import ZipFile
 def download_file_from_google_drive(id, destination):
     URL = "https://docs.google.com/uc?export=download"
 
@@ -31,6 +32,8 @@ def save_response_content(response, destination):
 
 if __name__ == '__main__':
     download_file_from_google_drive("0B2fg8yPGn2TCSW1pNTJMXzFPYTg","./data/tsp5.zip")
+    with ZipFile('./data/tsp5.zip', 'r') as zipObj:
+        zipObj.extractall('./data/')
     download_file_from_google_drive("0B2fg8yPGn2TCbHowM0hfOTJCNkU_","./data/tsp10.zip")
     download_file_from_google_drive("0B2fg8yPGn2TCUVlCQmQtelpZTTQ","./data/tsp50_test.zip")
     download_file_from_google_drive("0B2fg8yPGn2TCTWNxX21jTDBGeXc","./data/tsp5-20_train.zip")
