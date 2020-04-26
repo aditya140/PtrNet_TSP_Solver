@@ -1,10 +1,11 @@
 import numpy as np
-from scipy.spatial import distance_matrix,distance
+from scipy.spatial import distance_matrix, distance
 from .googleORsolver import *
 from .tsp_optimal import *
 from itertools import combinations
 import mlrose
 import torch
+
 
 def coord_to_dist_mat(coord):
     return distance_matrix(coord, coord)
@@ -20,7 +21,7 @@ class BaselineSolver(object):
             "Google OR": self.google_or_solver,
             "random": self.solve_random,
             "Nearest insertion": self.nearest_insertion,
-            "Genetic":self.genetic
+            "Genetic": self.genetic,
         }
 
     def create(self, coord):
@@ -55,12 +56,11 @@ class BaselineSolver(object):
 
     def add_model(self, model):
         self.model = model
-        self.solvers["Model"]=self.solve_model
+        self.solvers["Model"] = self.solve_model
 
     def solve_model(self):
-        o,p=self.model(torch.tensor([self.coord]))
+        o, p = self.model(torch.tensor([self.coord]))
         return p.tolist()[0]
-        
 
     def __create_mask(self, tour):
         ur = np.triu_indices(self.dist_mat.shape[0])
@@ -162,16 +162,21 @@ class BaselineSolver(object):
         return np.array(GoogleORsolver(self.dist_mat))
 
     def genetic(self):
-        problem_no_fit = mlrose.TSPOpt(length = len(self.coord), coords = self.coord, maximize=False)
-        best_state, best_fitness = mlrose.genetic_alg(problem_no_fit, mutation_prob = 0.2, max_attempts = 100,
-                                              random_state = 2)
+        problem_no_fit = mlrose.TSPOpt(
+            length=len(self.coord), coords=self.coord, maximize=False
+        )
+        best_state, best_fitness = mlrose.genetic_alg(
+            problem_no_fit, mutation_prob=0.2, max_attempts=100, random_state=2
+        )
 
         return best_state
 
     def optimal(self):
         return tsp_opt(self.coord)
 
-    def solve_all(self, coord,except_alg=[] , returnTours=False, ):
+    def solve_all(
+        self, coord, except_alg=[], returnTours=False,
+    ):
         self.create(coord)
 
         metrics = {}

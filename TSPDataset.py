@@ -5,18 +5,22 @@ from tqdm import tqdm
 from torch.utils.data import Dataset,DataLoader
 import numpy as np
 from tsp_solver import tsp_optimal
+from parser import FileParser
 
 class TSPDataset(Dataset):
     """
     Random TSP dataset
     """
-    def __init__(self, data_size, seq_len, solver=tsp_optimal.tsp_opt, solve=True, onlyInt=False):
+    def __init__(self, data_size, seq_len, solver=tsp_optimal.tsp_opt, solve=True, onlyInt=False, file=None):
         self.data_size = data_size
         self.seq_len = seq_len
         self.solve = solve
         self.solver = solver
         self.onlyInt=onlyInt
-        self.data = self._generate_data()
+        if file:
+            self.data=self._read_file(file)
+        else:
+            self.data = self._generate_data()
 
     def __len__(self):
         return self.data_size
@@ -45,6 +49,12 @@ class TSPDataset(Dataset):
                 solutions.append(self.solver(points))
         else:
             solutions = None
+        return {'Points_List':points_list, 'Solutions':solutions}
+
+    def _read_file(self,file):
+        parser=FileParser(self.seq_len,file)
+        points_list=np.array(parser.coords)
+        solutions=np.array(parser.tours)
         return {'Points_List':points_list, 'Solutions':solutions}
 
     def _to1hotvec(self, points):
