@@ -18,7 +18,7 @@ import pandas as pd
 
 
 def main():
-    test_dataset=TSPDataset(test_params.train_size,test_params.nof_points,file=test_params.file,)
+    test_dataset=TSPDataset(test_params.test_size,test_params.nof_points,file=test_params.file,)
     test_dataloader=DataLoader(test_dataset,batch_size=test_params.batch_size,num_workers=10)
     model = PointerNet(model_params.embedding_size,
                     model_params.hiddens,
@@ -34,7 +34,7 @@ def main():
     model.load_state_dict(torch.load(test_params.model))
     solver = BaselineSolver()
     remove_alg = ["Genetic", "Optimal"]
-    solver.add_model(model)
+    solver.add_model(model,device)
 
     data = []
     for i in test_dataloader:

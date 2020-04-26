@@ -153,12 +153,13 @@ class BaselineSolver(object):
     def solve_random(self):
         return self.solve(criterion="random")
 
-    def add_model(self, model):
+    def add_model(self, model,device):
         self.model = model
         self.solvers["Model"] = self.solve_model
+        self.model_device=device
 
     def solve_model(self):
-        o, p = self.model(torch.tensor([self.coord]))
+        o, p = self.model(torch.tensor([self.coord]).to(self.model_device))
         return p.tolist()[0]
 
     def __create_mask(self, tour):

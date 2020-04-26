@@ -70,7 +70,7 @@ if __name__=="__main__":
 
     model.to(device)
     CCE = torch.nn.CrossEntropyLoss()
-    optimizer=optim.Adam(filter(lambda p: p.requires_grad,model.parameters()),lr=params.lr)
+    optimizer=optim.Adam(filter(lambda p: p.requires_grad,model.parameters()),lr=model_params.lr)
     best_valid_loss=float('inf')
 
     for epoch in range(train_params.nof_epoch):
