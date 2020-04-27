@@ -48,6 +48,19 @@ def eval(model,iter,loss_func,device):
         val_losses.append(loss.item())
     return np.mean(val_losses)
 
+def write_model_params(model_path,model_params,train_params):
+    s="Model Parameters\n"
+    m_params=vars(model_params)
+    for k,v in m_params.items():
+        s+=f"{k}: {v}\n"
+    t_params=vars(train_params)
+    s+="\n\nTrain Parameters"
+    for k,v in t_params.items():
+        s+=f"{k}: {v}\n"
+    with open(model_path+model_params.name.split(".")[0]+".txt",'w') as f:
+        f.write(s)
+    
+
 
 if __name__=="__main__":
     ## Create Dataset for training
@@ -67,7 +80,7 @@ if __name__=="__main__":
         device=torch.device('cuda')
     else:
         device=torch.device('cpu')
-
+    write_model_params(model_path,model_params,train_params)
     model.to(device)
     CCE = torch.nn.CrossEntropyLoss()
     optimizer=optim.Adam(filter(lambda p: p.requires_grad,model.parameters()),lr=model_params.lr)
@@ -83,7 +96,7 @@ if __name__=="__main__":
         epoch_mins, epoch_secs = epoch_time(st_time, e_time)
         if valid_loss<best_valid_loss:
             best_valid_loss=valid_loss
-            torch.save(model.state_dict(),model_path+"model.pt")
+            torch.save(model.state_dict(),model_path+model_params.name)
         print(f'Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s')
         print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
         print(f'\t Val. Loss: {valid_loss:.3f} |  Val. PPL: {math.exp(valid_loss):7.3f}')

@@ -7,6 +7,7 @@ model_params={
         "nof_lstms": 2,
         "dropout": 0.1,
         "bidir": False,
+        "name":"model.pt"
 }
 
 model_params = argparse.Namespace(**model_params)
