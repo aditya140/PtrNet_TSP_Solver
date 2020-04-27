@@ -1,5 +1,5 @@
 from hparams import model_params,train_params
-from TSPDataset import TSPDataset
+from TSPDataset import TSPDataset,ConcatDataset
 from torch.utils.data import Dataset,DataLoader
 from PointerNet import PointerNet
 from tqdm import tqdm
@@ -12,6 +12,8 @@ import numpy as np
 import math
 import time
 from hyperdash import Experiment
+import glob
+
 
 
 
@@ -25,20 +27,21 @@ def epoch_time(start_time, end_time):
 def train(model,iter,loss_func,optimizer,device,exp):
     model.train()
     losses=[]
-    for idx,batch in enumerate(iter):
-        train_batch = Variable(batch['Points'].float()).to(device)
-        target_batch = Variable(batch['Solution']).to(device)
-        o, p = model(train_batch)
-        o = o.contiguous().view(-1, o.size()[-1])
-        target_batch = target_batch.view(-1)
-        loss = CCE(o, target_batch)
-        losses.append(loss.item())
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        if exp!=None:
-            exp.metric("train_batch",idx)
-            exp.metric("train_loss",loss.item())
+    for idx,batch_outer in enumerate(iter):
+        for batch in batch_outer:
+            train_batch = Variable(batch['Points'].float()).to(device)
+            target_batch = Variable(batch['Solution']).to(device)
+            o, p = model(train_batch)
+            o = o.contiguous().view(-1, o.size()[-1])
+            target_batch = target_batch.view(-1)
+            loss = CCE(o, target_batch)
+            losses.append(loss.item())
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            if exp!=None:
+                exp.metric("train_batch",idx)
+                exp.metric("train_loss",loss.item())
     return np.mean(losses)
 
 def eval(model,iter,loss_func,device,exp):
@@ -74,13 +77,19 @@ def write_model_params(model_path,model_params,train_params):
 
 if __name__=="__main__":
     ## Create Dataset for training
-    train_dataset=TSPDataset(train_params.train_size,train_params.nof_points,file=train_params.file,)
+    
+    files=glob.glob("./data/tsp_all_len*")
+    datasets=[]
+    for i in tqdm(files):
+        datasets.append(TSPDataset(train_params.train_size,int(i.split('.')[-2][17:]),file=i,))
+    concat_dataset=ConcatDataset(*datasets)
     val_dataset=TSPDataset(train_params.val_size,train_params.nof_points)
 
-    train_dataloader=DataLoader(train_dataset,batch_size=train_params.batch_size,num_workers=10)
+    train_dataloader=DataLoader(concat_dataset,batch_size=train_params.batch_size,num_workers=10)
     val_dataloader=DataLoader(val_dataset,batch_size=train_params.batch_size,num_workers=10)
 
     model_path="./model/"
+    model_prams.name="model_5-20.pt"
 
     model = PointerNet(model_params.embedding_size,
                     model_params.hiddens,
@@ -88,7 +97,7 @@ if __name__=="__main__":
                     model_params.bidir,
                     model_params.dropout)
     if train_params.hyperdash:
-        exp = Experiment("PtrNet-TSP"+model_params.name)
+        exp = Experiment("PtrNet-TSP 5-20")
     else:
         exp = None
     if model_params.gpu:

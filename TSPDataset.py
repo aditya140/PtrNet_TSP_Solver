@@ -123,3 +123,14 @@ class TSPDataset(Dataset):
         # if y is None:
         #     dist = dist - torch.diag(dist.diag)
         return torch.clamp(dist, 0.0, np.inf)
+
+
+class ConcatDataset(torch.utils.data.Dataset):
+    def __init__(self, *datasets):
+        self.datasets = datasets
+
+    def __getitem__(self, i):
+        return tuple(d[i] for d in self.datasets)
+
+    def __len__(self):
+        return min(len(d) for d in self.datasets)
