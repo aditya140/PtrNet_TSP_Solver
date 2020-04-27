@@ -42,7 +42,7 @@ class TSPDataset(Dataset):
         self.solver = solver
         self.onlyInt = onlyInt
         if file:
-            self.data = self._read_file(file)
+            self.data = self._read_file(file,data_size)
         else:
             self.data = self._generate_data()
 
