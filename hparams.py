@@ -1,13 +1,13 @@
 import argparse
 model_params={
-        "lr": 0.0001,
+        "lr": 1,
         "gpu": True,
         "embedding_size": 128,
         "hiddens": 256,
         "nof_lstms": 2,
         "dropout": 0.1,
         "bidir": False,
-        "name":"model.pt"
+        "name":"model_5.pt"
 }
 
 model_params = argparse.Namespace(**model_params)
@@ -16,9 +16,10 @@ train_params = {
     "train_size": 1000000,
     "val_size": 1000,
     "batch_size": 256,
-    "nof_epoch": 1,
+    "nof_epoch": 2,
     "nof_points": 5,
     "file":"./data/tsp5.txt",
+    "hyperdash":True,
 }
 
 train_params = argparse.Namespace(**train_params)
