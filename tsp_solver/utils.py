@@ -1,15 +1,18 @@
 import numpy as np
-from scipy.spatial import distance_matrix, distance
+# from scipy.spatial import distance_matrix, distance
 from .googleORsolver import *
 from .tsp_optimal import *
 from itertools import combinations
 import mlrose
 import torch
 import matplotlib.pyplot as plt
+from .dist_mat import distance_matrix
 
 
 def coord_to_dist_mat(coord):
-    return distance_matrix(coord, coord)
+    # return distance_matrix(coord, coord)
+    return distance_matrix(coord)
+
 
 
 def plotTSP(paths, points, num_iters=1):
@@ -159,7 +162,7 @@ class BaselineSolver(object):
         self.model_device=device
 
     def solve_model(self):
-        o, p = self.model(torch.tensor([self.coord]).to(self.model_device))
+        o, p = self.model(torch.tensor([self.coord]).float().to(self.model_device))
         return p.tolist()[0]
 
     def __create_mask(self, tour):

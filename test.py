@@ -31,7 +31,7 @@ def main():
         device=torch.device('cpu')
 
     model.to(device)
-    model.load_state_dict(torch.load(test_params.model))
+    model.load_state_dict(torch.load(test_params.model,map_location=device))
     solver = BaselineSolver()
     remove_alg = ["Genetic", "Optimal"]
     solver.add_model(model,device)
@@ -39,15 +39,16 @@ def main():
     data = []
     for i in test_dataloader:
         for x, y in zip(i["Points"], i["Solution"]):
-            res = solver.solve_all(x.tolist(), remove_alg, returnTours=False)
-            optimal = solver.tour_length(y.tolist())
+            res = solver.solve_all(x.numpy(), remove_alg, returnTours=False)
+            if "Optimal" in remove_alg:
+                res["Optimal"] = solver.tour_length(y.tolist())
+            res["Optimal"]=min(res["Google OR"],res["Optimal"])
             for k in res.keys():
-                res[k] = res[k] / optimal
-            res["Optimal"]=optimal
+                if k!="Optimal":
+                    res[k] = res[k] / res["Optimal"]
             data.append(res)
     df = pd.DataFrame(data)
     df.to_csv("results.csv")
     print(df.mean())
 if __name__ == '__main__':
     main()
-    

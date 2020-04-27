@@ -50,7 +50,7 @@ class TSPDataset(Dataset):
         return self.data_size
 
     def __getitem__(self, idx):
-        tensor = torch.from_numpy(self.data["Points_List"][idx]).float()
+        tensor = torch.from_numpy(self.data["Points_List"][idx])
         solution = (
             torch.from_numpy(self.data["Solutions"][idx]).long() if self.solve else None
         )
