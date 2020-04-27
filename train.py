@@ -75,7 +75,8 @@ if __name__=="__main__":
     model = PointerNet(model_params.embedding_size,
                     model_params.hiddens,
                     model_params.nof_lstms,
-                    model_params.bidir)
+                    model_params.bidir,
+                    model_params.dropout)
     if model_params.gpu:
         device=torch.device('cuda')
     else:

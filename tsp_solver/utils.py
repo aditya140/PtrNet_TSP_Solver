@@ -162,7 +162,8 @@ class BaselineSolver(object):
         self.model_device=device
 
     def solve_model(self):
-        o, p = self.model(torch.tensor([self.coord]).float().to(self.model_device))
+        with torch.no_grad():
+            o, p = self.model(torch.tensor([self.coord]).float().to(self.model_device))
         return p.tolist()[0]
 
     def __create_mask(self, tour):

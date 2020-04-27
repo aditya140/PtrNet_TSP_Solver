@@ -23,7 +23,8 @@ def main():
     model = PointerNet(model_params.embedding_size,
                     model_params.hiddens,
                     model_params.nof_lstms,
-                    model_params.bidir)
+                    model_params.bidir,
+                    model_params.dropout)
 
     if model_params.gpu:
         device=torch.device('cuda')
@@ -35,7 +36,7 @@ def main():
     solver = BaselineSolver()
     remove_alg = ["Genetic", "Optimal"]
     solver.add_model(model,device)
-
+    model.eval()
     data = []
     cnt=0
     for i in tqdm(test_dataloader):
