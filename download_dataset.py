@@ -34,8 +34,8 @@ if __name__ == '__main__':
     download_file_from_google_drive("0B2fg8yPGn2TCSW1pNTJMXzFPYTg","./data/tsp5.zip")
     with ZipFile('./data/tsp5.zip', 'r') as zipObj:
         zipObj.extractall('./data/')
-    download_file_from_google_drive("0B2fg8yPGn2TCbHowM0hfOTJCNkU_","./data/tsp10.zip")
-    with ZipFile('./data/tsp10.zip', 'r') as zipObj:
+    download_file_from_google_drive("0B2fg8yPGn2TCbHowM0hfOTJCNkU","./data/tsp_10_train.zip")
+    with ZipFile('./data/tsp_10_train.zip', 'r') as zipObj:
         zipObj.extractall('./data/')
     download_file_from_google_drive("0B2fg8yPGn2TCUVlCQmQtelpZTTQ","./data/tsp50_test.zip")
     with ZipFile('./data/tsp50_test.zip', 'r') as zipObj:
