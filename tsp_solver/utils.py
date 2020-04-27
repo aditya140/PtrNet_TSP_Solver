@@ -299,7 +299,6 @@ class BaselineSolver(object):
         """
 
         self.create(coord)
-
         metrics = {}
         for name, solver in self.solvers.items():
             if name not in except_alg:

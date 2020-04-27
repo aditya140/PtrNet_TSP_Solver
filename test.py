@@ -37,7 +37,9 @@ def main():
     solver.add_model(model,device)
 
     data = []
-    for i in test_dataloader:
+    
+    print(f"Data Loader Length: {len(test_dataloader)} ")
+    for i in tqdm(test_dataloader):
         for x, y in zip(i["Points"], i["Solution"]):
             res = solver.solve_all(x.tolist(), remove_alg, returnTours=False)
             optimal = solver.tour_length(y.tolist())

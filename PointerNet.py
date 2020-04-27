@@ -10,9 +10,9 @@ class Encoder(nn.Module):
         self.hid_dim=hid_dim//2 if bidir else hid_dim
         self.num_layers=num_layers*2 if bidir else num_layers
         self.emb_dim=emb_dim
-        self.embedding=nn.Linear(2,emb_dim)
-        self.rnn=nn.LSTM(self.emb_dim,self.hid_dim,num_layers,bidirectional=bidir)
-        self.h0=nn.Parameter(torch.zeros(1),requires_grad=False)
+        self.embedding=nn.Linear(2,emb_dim).double()
+        self.rnn=nn.LSTM(self.emb_dim,self.hid_dim,num_layers,bidirectional=bidir).double()
+        self.h0=nn.Parameter(torch.zeros(1),requires_grad=False).double()
 
     def forward(self,inp):
         embedded=self.embedding(inp)
@@ -28,10 +28,10 @@ class Attention(nn.Module):
         super().__init__()
         self.inp_dim=inp_dim
         self.hid_dim=hid_dim
-        self.inp_layer=nn.Linear(inp_dim,hid_dim)
-        self.context_layer=nn.Conv1d(inp_dim,hid_dim,1,1)
-        self._inf=nn.Parameter(torch.FloatTensor([float('-inf')]),requires_grad=False)
-        self.V=nn.Parameter(torch.FloatTensor(hid_dim),requires_grad=True)
+        self.inp_layer=nn.Linear(inp_dim,hid_dim).double()
+        self.context_layer=nn.Conv1d(inp_dim,hid_dim,1,1).double()
+        self._inf=nn.Parameter(torch.FloatTensor([float('-inf')]),requires_grad=False).double()
+        self.V=nn.Parameter(torch.FloatTensor(hid_dim),requires_grad=True).double()
 
         nn.init.uniform_(self.V,-1,1)
     def forward(self,inp,context,mask):
@@ -60,9 +60,9 @@ class Decoder(nn.Module):
         super().__init__()
         self.emb_dim=emb_dim
         self.hid_dim=hid_dim
-        self.hid_out=nn.Linear(hid_dim*2,hid_dim)
-        self.rnn=nn.LSTMCell(emb_dim,hid_dim)
-        self.att=Attention(hid_dim,hid_dim)
+        self.hid_out=nn.Linear(hid_dim*2,hid_dim).double()
+        self.rnn=nn.LSTMCell(emb_dim,hid_dim).double()
+        self.att=Attention(hid_dim,hid_dim).double()
 
         self.mask=nn.Parameter(torch.ones(1),requires_grad=False)
         self.runner=nn.Parameter(torch.ones(1),requires_grad=False)
@@ -101,7 +101,7 @@ class PointerNet(nn.Module):
         super().__init__()
         self.bidir=bidir
         self.encoder=Encoder(emb_dim,hid_dim,num_layers,bidir)
-        self.h0=nn.Parameter(torch.FloatTensor(emb_dim),requires_grad=False)
+        self.h0=nn.Parameter(torch.FloatTensor(emb_dim),requires_grad=False).double()
         self.decoder=Decoder(emb_dim,hid_dim)
         nn.init.uniform_(self.h0, -1, 1)
     def forward(self,inp):

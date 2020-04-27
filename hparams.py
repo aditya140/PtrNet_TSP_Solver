@@ -1,7 +1,7 @@
 import argparse
 model_params={
         "lr": 0.0001,
-        "gpu": True,
+        "gpu": False,
         "embedding_size": 128,
         "hiddens": 256,
         "nof_lstms": 2,

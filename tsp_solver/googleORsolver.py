@@ -94,7 +94,7 @@ def GoogleORsolver(dist_mat,isFloat=True):
             # max_route_distance=print_solution(data, manager, routing, solution)
         return False
     def scale(dist_mat):
-        scale=100000000
+        scale=10000000
         return dist_mat*scale,scale
     if isFloat:
         dist_mat,factor=scale(dist_mat)
