@@ -1,0 +1,17 @@
+Model Parameters
+lr: 1.0
+gpu: True
+embedding_size: 128
+hiddens: 256
+nof_lstms: 2
+dropout: 0.1
+bidir: False
+name: model_5.pt
+
+
+Train Parameterstrain_size: 1000000
+val_size: 1000
+batch_size: 256
+nof_epoch: 30
+nof_points: 5
+file: ./data/tsp5.txt

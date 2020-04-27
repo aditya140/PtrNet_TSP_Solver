@@ -5,13 +5,13 @@ import torch.optim as optim
 
 
 class Encoder(nn.Module):
-    def __init__(self,emb_dim,hid_dim,num_layers,bidir):
+    def __init__(self,emb_dim,hid_dim,num_layers,bidir,dropout):
         super().__init__()
         self.hid_dim=hid_dim//2 if bidir else hid_dim
         self.num_layers=num_layers*2 if bidir else num_layers
         self.emb_dim=emb_dim
         self.embedding=nn.Linear(2,emb_dim)
-        self.rnn=nn.LSTM(self.emb_dim,self.hid_dim,num_layers,bidirectional=bidir)
+        self.rnn=nn.LSTM(self.emb_dim,self.hid_dim,num_layers,bidirectional=bidir,dropout=dropout)
         self.h0=nn.Parameter(torch.zeros(1),requires_grad=False)
 
     def forward(self,inp):
@@ -97,10 +97,10 @@ class Decoder(nn.Module):
 
 
 class PointerNet(nn.Module):
-    def __init__(self,emb_dim,hid_dim,num_layers,bidir):
+    def __init__(self,emb_dim,hid_dim,num_layers,bidir,dropout):
         super().__init__()
         self.bidir=bidir
-        self.encoder=Encoder(emb_dim,hid_dim,num_layers,bidir)
+        self.encoder=Encoder(emb_dim,hid_dim,num_layers,bidir,dropout,)
         self.h0=nn.Parameter(torch.FloatTensor(emb_dim),requires_grad=False)
         self.decoder=Decoder(emb_dim,hid_dim)
         nn.init.uniform_(self.h0, -1, 1)

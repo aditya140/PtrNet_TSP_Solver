@@ -1,16 +1,113 @@
 import numpy as np
-from scipy.spatial import distance_matrix,distance
+# from scipy.spatial import distance_matrix, distance
 from .googleORsolver import *
 from .tsp_optimal import *
 from itertools import combinations
 import mlrose
+import torch
+import matplotlib.pyplot as plt
+from .dist_mat import distance_matrix
 
 
 def coord_to_dist_mat(coord):
-    return distance_matrix(coord, coord)
+    # return distance_matrix(coord, coord)
+    return distance_matrix(coord)
+
+
+
+def plotTSP(paths, points, num_iters=1):
+
+    """
+    path: List of lists with the different orders in which the nodes are visited
+    points: coordinates for the different nodes
+    num_iters: number of paths that are in the path list
+    
+    """
+
+    # Unpack the primary TSP path and transform it into a list of ordered
+    # coordinates
+
+    x = []
+    y = []
+    for i in paths[0]:
+        x.append(points[i][0])
+        y.append(points[i][1])
+
+    plt.plot(x, y, "co")
+
+    # Set a scale for the arrow heads (there should be a reasonable default for this, WTF?)
+    a_scale = float(max(x)) / float(100)
+
+    # Draw the older paths, if provided
+    if num_iters > 1:
+
+        for i in range(1, num_iters):
+
+            # Transform the old paths into a list of coordinates
+            xi = []
+            yi = []
+            for j in paths[i]:
+                xi.append(points[j][0])
+                yi.append(points[j][1])
+
+            plt.arrow(
+                xi[-1],
+                yi[-1],
+                (xi[0] - xi[-1]),
+                (yi[0] - yi[-1]),
+                head_width=a_scale,
+                color="r",
+                length_includes_head=True,
+                ls="dashed",
+                width=0.001 / float(num_iters),
+            )
+            for i in range(0, len(x) - 1):
+                plt.arrow(
+                    xi[i],
+                    yi[i],
+                    (xi[i + 1] - xi[i]),
+                    (yi[i + 1] - yi[i]),
+                    head_width=a_scale,
+                    color="r",
+                    length_includes_head=True,
+                    ls="dashed",
+                    width=0.001 / float(num_iters),
+                )
+
+    # Draw the primary path for the TSP problem
+    plt.arrow(
+        x[-1],
+        y[-1],
+        (x[0] - x[-1]),
+        (y[0] - y[-1]),
+        head_width=a_scale,
+        color="g",
+        length_includes_head=True,
+    )
+    for i in range(0, len(x) - 1):
+        plt.arrow(
+            x[i],
+            y[i],
+            (x[i + 1] - x[i]),
+            (y[i + 1] - y[i]),
+            head_width=a_scale,
+            color="g",
+            length_includes_head=True,
+        )
+
+    # Set axis too slitghtly larger than the set of x and y
+    plt.xlim(0, max(x) * 1.1)
+    plt.ylim(0, max(y) * 1.1)
+    plt.show()
+
 
 
 class BaselineSolver(object):
+    """[summary]
+    Baseline Solver To solve TSP using conventional Algorithmsself.
+    Call `.create` to initialize a new TSP problem
+    """
+
     def __init__(self):
         self.model = {}
         self.solvers = {
@@ -20,10 +117,16 @@ class BaselineSolver(object):
             "Google OR": self.google_or_solver,
             "random": self.solve_random,
             "Nearest insertion": self.nearest_insertion,
-            "Genetic":self.genetic
+            "Genetic": self.genetic,
         }
 
     def create(self, coord):
+        """[summary]
+        Creates and loads a new TSP problemset
+
+        Arguments:
+            coord {[type]} -- List of Coordinates in the TSP
+        """
         self.coord = coord
         self.coordDict = {i: self.coord[i] for i in range(0, len(self.coord))}
         self.dist_mat = coord_to_dist_mat(self.coord)
@@ -53,12 +156,15 @@ class BaselineSolver(object):
     def solve_random(self):
         return self.solve(criterion="random")
 
-    def add_model(self, model, name="PtrNet"):
-        self.model[name] = model
-        self.solvers[name]=self.solve_model
+    def add_model(self, model,device):
+        self.model = model
+        self.solvers["Model"] = self.solve_model
+        self.model_device=device
 
     def solve_model(self):
-        pass
+        with torch.no_grad():
+            o, p = self.model(torch.tensor([self.coord]).float().to(self.model_device))
+        return p.tolist()[0]
 
     def __create_mask(self, tour):
         ur = np.triu_indices(self.dist_mat.shape[0])
@@ -149,6 +255,14 @@ class BaselineSolver(object):
         return cur
 
     def tour_length(self, tour):
+        """[summary]
+        Returns the tour length of a given tour for the loaded problemset
+        Arguments:
+            tour {List[int]} -- Tour whose length is to be calculated
+
+        Returns:
+            Int -- Tour Length
+        """
         assert len(tour) > 2
         tour_len = 0
         for i in range(len(tour) - 1):
@@ -160,21 +274,39 @@ class BaselineSolver(object):
         return np.array(GoogleORsolver(self.dist_mat))
 
     def genetic(self):
-        problem_no_fit = mlrose.TSPOpt(length = len(self.coord), coords = self.coord, maximize=False)
-        best_state, best_fitness = mlrose.genetic_alg(problem_no_fit, mutation_prob = 0.2, max_attempts = 100,
-                                              random_state = 2)
+        problem_no_fit = mlrose.TSPOpt(
+            length=len(self.coord), coords=self.coord, maximize=False
+        )
+        best_state, best_fitness = mlrose.genetic_alg(
+            problem_no_fit, mutation_prob=0.2, max_attempts=100, random_state=2
+        )
 
         return best_state
 
     def optimal(self):
         return tsp_opt(self.coord)
 
-    def solve_all(self, coord, returnTours=False, optimal=True):
+    def solve_all(
+        self, coord, except_alg=[], returnTours=False,
+    ):
+        """[summary]
+
+        Arguments:
+            coord {List[float]} -- List of coordinates
+
+        Keyword Arguments:
+            except_alg {list} -- Algorithms NOT to run (default: {[]})
+            returnTours {bool} -- Return Tours along with length (default: {False})
+
+        Returns:
+            [dict] -- dictionary with tour length of all algorithms
+        """
+
         self.create(coord)
 
         metrics = {}
         for name, solver in self.solvers.items():
-            if not(optimal and name=="Optimal"):
+            if name not in except_alg:
                 tour = solver()
                 if returnTours:
                     metrics[name] = (self.tour_length(tour), tour)
@@ -187,9 +319,3 @@ def create_random_points(num_points, val_range=(0, 100)):
     return np.random.randint(
         val_range[0], val_range[0] + val_range[1], size=(num_points, 2)
     )
-
-
-if __name__ == "__main__":
-    coord = create_random_points(15)
-    solver = BaselineSolver(coord)
-    print(solver.solve_all())
