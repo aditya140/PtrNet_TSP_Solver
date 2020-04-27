@@ -22,7 +22,7 @@ def train(model,iter,loss_func,optimizer,device):
     model.train()
     losses=[]
     for idx,batch in enumerate(iter):
-        train_batch = Variable(batch['Points']).to(device)
+        train_batch = Variable(batch['Points'].float()).to(device)
         target_batch = Variable(batch['Solution']).to(device)
         o, p = model(train_batch)
         o = o.contiguous().view(-1, o.size()[-1])
@@ -38,7 +38,7 @@ def eval(model,iter,loss_func,device):
     model.eval()
     val_losses=[]
     for idx,batch in enumerate(iter):
-        train_batch = Variable(batch['Points']).to(device)
+        train_batch = Variable(batch['Points'].float()).to(device)
         target_batch = Variable(batch['Solution']).to(device)
         with torch.no_grad():
             o, p = model(train_batch)

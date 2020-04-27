@@ -77,17 +77,19 @@ class TSPDataset(Dataset):
             solutions = None
         return {"Points_List": points_list, "Solutions": solutions}
 
-    def _read_file(self, file):
+    def _read_file(self, file, data_size):
         """[summary]
 
         Arguments:
-            file {[type]} -- 
+            file {[type]}
 
-        """ 
+        """
         parser = FileParser(self.seq_len, file)
-        self.data_size=len(parser.tours)
-        points_list = np.array(parser.coords)
-        solutions = np.array(parser.tours)
+        d_size = len(parser.tours)
+        if d_size < data_size:
+            self.data_size = d_size
+        points_list = np.array(parser.coords[: self.data_size])
+        solutions = np.array(parser.tours[: self.data_size])
         return {"Points_List": points_list, "Solutions": solutions}
 
     def _to1hotvec(self, points):
@@ -98,7 +100,6 @@ class TSPDataset(Dataset):
         vec = np.zeros((len(points), self.seq_len))
         for i, v in enumerate(vec):
             v[points[i]] = 1
-
         return vec
 
     def pairwise_distances(self, x, y=None):
@@ -122,4 +123,3 @@ class TSPDataset(Dataset):
         # if y is None:
         #     dist = dist - torch.diag(dist.diag)
         return torch.clamp(dist, 0.0, np.inf)
-

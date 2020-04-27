@@ -37,7 +37,8 @@ def main():
     solver.add_model(model,device)
 
     data = []
-    for i in test_dataloader:
+    cnt=0
+    for i in tqdm(test_dataloader):
         for x, y in zip(i["Points"], i["Solution"]):
             res = solver.solve_all(x.numpy(), remove_alg, returnTours=False)
             if "Optimal" in remove_alg:
@@ -47,8 +48,12 @@ def main():
                 if k!="Optimal":
                     res[k] = res[k] / res["Optimal"]
             data.append(res)
+            cnt+=1
+        if cnt>=test_params.test_size:
+            break
     df = pd.DataFrame(data)
-    df.to_csv("results.csv")
+    result_file=test_params.model.split("/")[-1].split(".")[0]+test_params.file.split("/")[-1].split(".")[0]+".csv"
+    df.to_csv(result_file)
     print(df.mean())
 if __name__ == '__main__':
     main()
