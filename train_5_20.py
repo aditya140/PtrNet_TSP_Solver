@@ -67,7 +67,7 @@ def write_model_params(model_path,model_params,train_params):
     for k,v in m_params.items():
         s+=f"{k}: {v}\n"
     t_params=vars(train_params)
-    s+="\n\nTrain Parameters"
+    s+="\n\nTrain Parameters\n"
     for k,v in t_params.items():
         s+=f"{k}: {v}\n"
     with open(model_path+model_params.name.split(".")[0]+".txt",'w') as f:
@@ -89,7 +89,7 @@ if __name__=="__main__":
     val_dataloader=DataLoader(val_dataset,batch_size=train_params.batch_size,num_workers=10)
 
     model_path="./model/"
-    model_prams.name="model_5-20.pt"
+    model_params.name="model_5-20.pt"
 
     model = PointerNet(model_params.embedding_size,
                     model_params.hiddens,
