@@ -1,8 +1,8 @@
 # PtrNet_TSP_Solver
 
 # Google colab - 
-* use the TSP_train.ipynb for training.
-* use the TSP_run.ipynb for inference
+* use the `TSP_train.ipynb` for training.
+* use the `TSP_run.ipynb` for inference.
 
 # How to train the model -
 * The dataset can be downloaded by running the `download_dataset.py` file.
