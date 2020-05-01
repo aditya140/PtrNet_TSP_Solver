@@ -21,8 +21,6 @@ def GoogleORsolver(dist_mat,isFloat=True):
             index = solution.Value(routing.NextVar(index))
         return tour
 
-
-
     def print_solution(data, manager, routing, solution):
         """Prints solution on console."""
         max_route_distance = 0
@@ -42,7 +40,6 @@ def GoogleORsolver(dist_mat,isFloat=True):
             max_route_distance = max(route_distance, max_route_distance)
         print('Maximum of the route distances: {}m'.format(max_route_distance))
         return max_route_distance
-
 
     def solve(coord):
         """Solve the CVRP problem."""

@@ -1,6 +1,10 @@
 import numpy as np
 
 class FileParser(object):
+    """[summary]
+
+    Parser to parse the dataset files provided by the author
+    """
     def __init__(self, numOfNodes, filePath):
         self.numOfNodes = numOfNodes
         self.filePath = filePath

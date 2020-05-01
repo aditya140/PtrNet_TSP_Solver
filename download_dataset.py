@@ -31,6 +31,9 @@ def save_response_content(response, destination):
 
 
 if __name__ == '__main__':
+    """
+    Run this file to download the authors dataset from google drive 
+    """    
     download_file_from_google_drive("0B2fg8yPGn2TCSW1pNTJMXzFPYTg","./data/tsp5.zip")
     with ZipFile('./data/tsp5.zip', 'r') as zipObj:
         zipObj.extractall('./data/')

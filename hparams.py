@@ -1,4 +1,8 @@
 import argparse
+
+"""
+Specify Model Parameters here
+"""
 model_params={
         "lr": 1,
         "gpu": True,
@@ -11,7 +15,9 @@ model_params={
 }
 
 model_params = argparse.Namespace(**model_params)
-
+"""
+Specify Training Parameters here
+"""
 train_params = {
     "train_size": 1000000,
     "val_size": 1000,
@@ -19,16 +25,20 @@ train_params = {
     "nof_epoch": 2,
     "nof_points": 5,
     "file":"./data/tsp5.txt",
-    "hyperdash":True,
+    "hyperdash":False,
 }
 
 train_params = argparse.Namespace(**train_params)
 
+
+"""
+Specify Testing Parameters here
+"""
 test_params={
         "test_size":10,
         "batch_size":16,
         "nof_points": 5,
-        "model":"./model/model.pt",
+        "model":"./model/model_5.pt",
         "file":"./data/tsp5_test.txt",
 }
 

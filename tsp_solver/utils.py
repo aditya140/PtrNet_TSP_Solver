@@ -104,7 +104,8 @@ def plotTSP(paths, points, num_iters=1):
 
 class BaselineSolver(object):
     """[summary]
-    Baseline Solver To solve TSP using conventional Algorithmsself.
+    Baseline Solver To solve TSP using conventional Algorithms.
+    Call solve_all to solve a TSP using all solvers
     Call `.create` to initialize a new TSP problem
     """
 

@@ -96,8 +96,17 @@ class Decoder(nn.Module):
         return (outputs, pointers), hid
 
 
-class PointerNet(nn.Module):
+class PointerNet(nn.Module):    
     def __init__(self,emb_dim,hid_dim,num_layers,bidir,dropout):
+        """[summary]
+        PointerNet Module
+        Arguments:
+            emb_dim {[int]} -- Embedding Dimension
+            hid_dim {[int]} -- Hidden Dimension
+            num_layers {[int]} -- Num Layers
+            bidir {[bool]} -- Bidirectional
+            dropout {[float]} -- Dropout value
+        """        
         super().__init__()
         self.bidir=bidir
         self.encoder=Encoder(emb_dim,hid_dim,num_layers,bidir,dropout,)
