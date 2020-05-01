@@ -15,5 +15,5 @@
 * run the `test.py` file for testing and creating metric csv's
 
 # How to generate result metrics - 
-* Use the `metrics.ipynb` file to generate metrics.
+* Use the `Results/metrics.ipynb` file to generate metrics.
 * Modify the notebook to create metrics for 5 point model and 10 point model.
