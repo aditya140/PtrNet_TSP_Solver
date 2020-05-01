@@ -5,6 +5,7 @@
 * use the `TSP_run.ipynb` for inference.
 
 # How to train the model -
+* Run `pip install -r requirements.txt` to install  dependencies
 * The dataset can be downloaded by running the `download_dataset.py` file.
 * Specify the hyperparameters and the type of model you need to train along with the save locations in `hparams.py`
 * Run `train.py` to train the model
